@@ -4,6 +4,7 @@ import dataset
 import textprocessing
 import dimred
 import projection
+import clustering
 
 app = Flask(__name__)
 # allows cross origin to be called from localhost:3000
@@ -17,7 +18,8 @@ x_lsa, lsa = dimred.lsa(x_tfidf)
 proj_euclidean_lsa = projection.tsne_euclidean(x_lsa)
 proj_cosine_tfidf = projection.tsne_cosine(x_tfidf)
 proj_euclidean_tfidf = projection.tsne_euclidean_tfidf(x_tfidf)
-
+clustering_model = clustering.kmeans(4, x_tfidf)
+clustering_labels = clustering_model.labels_
 
 @app.route("/")
 def hello_world():
@@ -33,4 +35,4 @@ def get_projection():
         proj = proj_cosine_tfidf
     elif distance == "euclidean_tfidf":
         proj = proj_euclidean_tfidf
-    return {"projection": proj.tolist(), "categories": dataset.target.tolist()}
+    return {"projection": proj.tolist(), "categories": dataset.target.tolist(), "kmeans": clustering_labels.tolist()}
